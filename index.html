@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Race to Health</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Inisialisasi karakter
+        const character = {
+            x: 50,
+            y: canvas.height / 2,
+            speed: 5,
+        };
+
+        // Inisialisasi tablet tambah darah
+        const tablets = [];
+        const tabletWidth = 20;
+        const tabletHeight = 20;
+
+        // Inisialisasi skor
+        let score = 0;
+
+        // Fungsi untuk menggambar karakter
+        function drawCharacter() {
+            ctx.fillStyle = "blue";
+            ctx.fillRect(character.x, character.y, 20, 20);
+        }
+
+        // Fungsi untuk menggambar tablet tambah darah
+        function drawTablets() {
+            ctx.fillStyle = "red";
+            for (let i = 0; i < tablets.length; i++) {
+                ctx.fillRect(tablets[i].x, tablets[i].y, tabletWidth, tabletHeight);
+            }
+        }
+
+        // Fungsi untuk menggerakkan karakter
+        function moveCharacter() {
+            document.addEventListener("keydown", function(event) {
+                if (event.key === "ArrowRight" && character.x < canvas.width - 20) {
+                    character.x += character.speed;
+                }
+                if (event.key === "ArrowLeft" && character.x > 0) {
+                    character.x -= character.speed;
+                }
+                if (event.key === "ArrowUp" && character.y > 0) {
+                    character.y -= character.speed;
+                }
+                if (event.key === "ArrowDown" && character.y < canvas.height - 20) {
+                    character.y += character.speed;
+                }
+            });
+        }
+
+        // Fungsi untuk menghasilkan tablet tambah darah secara acak
+        function generateTablet() {
+            const x = canvas.width;
+            const y = Math.random() * (canvas.height - tabletHeight);
+            tablets.push({ x, y });
+        }
+
+        // Fungsi untuk mendeteksi tabrakan antara karakter dan tablet tambah darah
+        function checkCollisions() {
+            for (let i = 0; i < tablets.length; i++) {
+                if (
+                    character.x < tablets[i].x + tabletWidth &&
+                    character.x + 20 > tablets[i].x &&
+                    character.y < tablets[i].y + tabletHeight &&
+                    character.y + 20 > tablets[i].y
+                ) {
+                    tablets.splice(i, 1);
+                    score++;
+                }
+            }
+        }
+
+        // Fungsi utama game loop
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawCharacter();
+            drawTablets();
+            checkCollisions();
+
+            if (Math.random() < 0.02) {
+                generateTablet();
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Memulai permainan
+        moveCharacter();
+        gameLoop();
+    </script>
+</body>
+</html>
